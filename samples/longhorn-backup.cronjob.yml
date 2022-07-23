@@ -1,0 +1,42 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: longhorn-backup
+  namespace: longhorn-backup
+spec:
+  schedule: "0 1 * * 0"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+          - name: longhorn-backup
+            image: ## Image Source
+            imagePullPolicy: IfNotPresent
+            env:
+            - name: GPG
+              value: "true"
+            envFrom:
+            - secretRef:
+                name: longhorn-backup
+            securityContext:
+              privileged: true
+            volumeMounts:
+              - name: nfs-longhorn-backup
+                mountPath: /backup
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: nbd
+                    operator: In
+                    values:
+                    -  'true'
+          volumes:
+          - name: nfs-longhorn-backup
+            persistentVolumeClaim:
+              claimName: nfs-longhorn-backup
+
