@@ -1,4 +1,4 @@
-FROM longhornio/longhorn-engine:v1.3.1
+FROM longhornio/longhorn-engine:v1.3.2
 
 RUN zypper -n install tar python3-requests python3-six && rm -rf /var/cache/zypp/*
 
